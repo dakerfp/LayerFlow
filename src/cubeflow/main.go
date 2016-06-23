@@ -1,8 +1,8 @@
 package main
 
 import (
-	"os"
 	"fmt"
+	"os"
 )
 
 func main() {
@@ -11,4 +11,6 @@ func main() {
 		os.Exit(1)
 	}
 	fmt.Fprintln(os.Stderr, tokenGrid)
+	program := assembleLayer(tokenGrid)
+	fmt.Fprintln(os.Stderr, program)
 }
