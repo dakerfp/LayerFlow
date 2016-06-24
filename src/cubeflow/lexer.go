@@ -13,25 +13,40 @@ type TokenGrid struct {
 func lexer(reader io.Reader) (*TokenGrid, error) {
 	// TODO: currently lexer only reads a single 2D grid
 	grid := &TokenGrid{
-		Size{0, 0},
+		Size{0, 0, 0},
 		make(map[Index]rune),
 	}
 
 	scanner := bufio.NewScanner(reader)
+	idx := Index{0, 0, 0}
 	for scanner.Scan() {
-		for i, r := range scanner.Text() {
+		var r rune
+		any := false
+		for idx.Col, r = range scanner.Text() {
+			any = true
 			if r == '#' { // Comment
 				break
 			}
 			if r == ' ' { // Whitespace
 				continue
 			}
-			grid.Tokens[Index{Row: grid.Rows, Col: i}] = r
-			if i > grid.Cols {
-				grid.Cols = i
+			grid.Tokens[idx] = r
+			if idx.Col > grid.Cols {
+				grid.Cols = idx.Col
 			}
 		}
-		grid.Rows += 1
+		if !any {
+			// XXX: never happens
+			idx.Row = 0
+			idx.Layer += 1
+			grid.Layers = idx.Layer
+		} else {
+			idx.Row += 1
+			if idx.Row > grid.Rows {
+				grid.Rows = idx.Row
+			}
+		}
 	}
+
 	return grid, nil
 }
