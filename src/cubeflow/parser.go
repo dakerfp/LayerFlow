@@ -1,7 +1,9 @@
 package main
 
-type Value int
+type Value int64
+
 type Type interface {
+	Exec(notify chan Value, halt chan int) bool
 }
 
 type Cell struct {
@@ -15,20 +17,51 @@ type Program struct {
 	Size
 	Cells         map[Index]Cell
 	Input, Output chan Value
+	Halt          chan int
 }
 
-type Source struct {
+type Forward struct {
+	Input chan Value
 }
 
-type Sink struct {
-	Inputs []chan Value
+func (s *Forward) Exec(notify chan Value, halt chan int) bool {
+	select {
+	case v, ok := <-s.Input:
+		if !ok {
+			return false
+		}
+		select {
+		case <-halt:
+			return false
+		case notify <- v:
+			return true
+		}
+	case <-halt:
+		return false
+	}
+}
+
+type Constant struct {
+	Value
+}
+
+func (c *Constant) Exec(notify chan Value, halt chan int) bool {
+	select {
+	case <-halt:
+		return false
+	case notify <- c.Value:
+		return true
+	}
 }
 
 func assembleLayer(grid *TokenGrid) *Program {
 	// TODO: support more than one input and output chan per layer
 	program := &Program{
-		Size:  grid.Size,
-		Cells: make(map[Index]Cell),
+		Size:   grid.Size,
+		Cells:  make(map[Index]Cell),
+		Input:  make(chan Value, 1),
+		Halt:   make(chan int, 1),
+		Output: nil,
 	}
 
 	// Build cells & the layer channels
@@ -39,10 +72,12 @@ func assembleLayer(grid *TokenGrid) *Program {
 			Symbol: r,
 		}
 		switch r {
+		case '0':
+			cell.Type = &Constant{0}
 		case '@':
-			cell.Type = &Source{}
+			cell.Type = &Forward{}
 		case '!':
-			cell.Type = &Sink{}
+			cell.Type = &Forward{}
 		}
 		program.Cells[idx] = cell
 	}
@@ -52,13 +87,14 @@ func assembleLayer(grid *TokenGrid) *Program {
 	for idx, cell := range program.Cells {
 		switch cell.Symbol {
 		case '@':
-			program.Input = cell.Notify
+			cell.Notify = program.Input
 		case '!':
 			program.Output = cell.Notify
-			sink := cell.Type.(*Sink)
+			sink := cell.Type.(*Forward)
 			for _, nidx := range idx.Neighbours() {
 				if n, ok := program.Cells[nidx]; ok {
-					sink.Inputs = append(sink.Inputs, n.Notify)
+					sink.Input = n.Notify
+					break // TODO: check for errors
 				}
 			}
 		}
