@@ -19,7 +19,7 @@ func TestCompile(t *testing.T) {
 		if err != nil {
 			t.Fail()
 		}
-		if assembleLayer(tokenGrid) == nil {
+		if _, err := assembleLayer(tokenGrid); err != nil {
 			t.Fail()
 		}
 	}
@@ -31,8 +31,8 @@ func TestZeroSink(t *testing.T) {
 	if err != nil {
 		t.Fail()
 	}
-	program := assembleLayer(tokenGrid)
-	if program == nil {
+	program, err := assembleLayer(tokenGrid)
+	if err != nil {
 		t.Fail()
 	}
 
@@ -58,8 +58,8 @@ func TestSourceSink(t *testing.T) {
 		if err != nil {
 			t.Fail()
 		}
-		program := assembleLayer(tokenGrid)
-		if program == nil {
+		program, err := assembleLayer(tokenGrid)
+		if err != nil {
 			t.Fail()
 		}
 

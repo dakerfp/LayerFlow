@@ -1,9 +1,16 @@
 package main
 
+import (
+	"errors"
+)
+
+var ErrBinding = errors.New("Error on binding")
+
 type Value int64
 
 type Type interface {
 	Exec(notify chan Value, halt chan int) bool
+	Bind(input chan Value) error
 }
 
 type Cell struct {
@@ -41,6 +48,14 @@ func (s *Forward) Exec(notify chan Value, halt chan int) bool {
 	}
 }
 
+func (f *Forward) Bind(notify chan Value) error {
+	if f.Input != nil {
+		return ErrBinding
+	}
+	f.Input = notify
+	return nil
+}
+
 type Constant struct {
 	Value
 }
@@ -54,7 +69,11 @@ func (c *Constant) Exec(notify chan Value, halt chan int) bool {
 	}
 }
 
-func assembleLayer(grid *TokenGrid) *Program {
+func (c *Constant) Bind(chan Value) error {
+	return nil
+}
+
+func assembleLayer(grid *TokenGrid) (*Program, error) {
 	// TODO: support more than one input and output chan per layer
 	program := &Program{
 		Size:   grid.Size,
@@ -87,19 +106,22 @@ func assembleLayer(grid *TokenGrid) *Program {
 	for idx, cell := range program.Cells {
 		switch cell.Symbol {
 		case '@':
-			sink := cell.Type.(*Forward)
-			sink.Input = program.Input
+			cell.Type.Bind(program.Input)
+			continue
 		case '!':
 			program.Output = cell.Notify
-			sink := cell.Type.(*Forward)
-			for _, nidx := range idx.Neighbours() {
-				if n, ok := program.Cells[nidx]; ok {
-					sink.Input = n.Notify
-					break // TODO: check for errors
+		}
+
+		// Try to bind all the neighbours
+		for _, nidx := range idx.Neighbours() {
+			if n, ok := program.Cells[nidx]; ok {
+				err := cell.Type.Bind(n.Notify)
+				if err != nil {
+					return nil, err
 				}
 			}
 		}
 	}
 
-	return program
+	return program, nil
 }

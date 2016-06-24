@@ -33,8 +33,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	program := assembleLayer(tokenGrid)
-	if program == nil {
+	program, err := assembleLayer(tokenGrid)
+	if err != nil {
 		log.Fatal("compilation error")
 	} else if *debug {
 		log.Println(program)
