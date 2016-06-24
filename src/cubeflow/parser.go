@@ -87,7 +87,8 @@ func assembleLayer(grid *TokenGrid) *Program {
 	for idx, cell := range program.Cells {
 		switch cell.Symbol {
 		case '@':
-			cell.Notify = program.Input
+			sink := cell.Type.(*Forward)
+			sink.Input = program.Input
 		case '!':
 			program.Output = cell.Notify
 			sink := cell.Type.(*Forward)
