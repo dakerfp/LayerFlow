@@ -51,40 +51,43 @@ func TestZeroSink(t *testing.T) {
 }
 
 func TestSourceSink(t *testing.T) {
-	r := strings.NewReader("@!")
-	tokenGrid, err := lexer(r)
-	if err != nil {
-		t.Fail()
-	}
-	program := assembleLayer(tokenGrid)
-	if program == nil {
-		t.Fail()
-	}
-
-	data := []Value{1, 2, 3, 4, 5}
-
-	go func() {
-		for _, v := range data {
-			t.Log("send:", v)
-			program.Input <- v
+	sources := []string{"@!", "!@", "@\n!", "!\n@"}
+	for _, source := range sources {
+		r := strings.NewReader(source)
+		tokenGrid, err := lexer(r)
+		if err != nil {
+			t.Fail()
 		}
-		program.Halt <- 0
-	}()
+		program := assembleLayer(tokenGrid)
+		if program == nil {
+			t.Fail()
+		}
 
-	go func() {
-		var i int
-		for v := range program.Output {
-			t.Log("recv:", v)
-			if v != data[i] {
-				t.Fatal("wrong data")
+		data := []Value{1, 2, 3, 4, 5}
+
+		go func() {
+			for _, v := range data {
+				t.Log("send:", v)
+				program.Input <- v
 			}
-			i += 1
-		}
-		_, ok := <-program.Output
-		if ok {
-			t.Fatal("output should be close")
-		}
-	}()
+			program.Halt <- 0
+		}()
 
-	program.Run()
+		go func() {
+			var i int
+			for v := range program.Output {
+				t.Log("recv:", v)
+				if v != data[i] {
+					t.Fatal("wrong data")
+				}
+				i += 1
+			}
+			_, ok := <-program.Output
+			if ok {
+				t.Fatal("output should be close")
+			}
+		}()
+
+		program.Run()
+	}
 }
