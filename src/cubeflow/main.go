@@ -34,12 +34,9 @@ func main() {
 	program, err := assembleLayer(tokenGrid)
 	if err != nil {
 		log.Fatal("compilation error")
-	} else if *verbose {
-		log.Println(program)
 	}
-
 	if *verbose {
-		err = WriteGrid(os.Stdout, program)
+		err = WriteGrid(os.Stderr, program)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -59,7 +56,7 @@ func main() {
 
 	go func() {
 		for v := range program.Output {
-			fmt.Println(os.Stdout, v)
+			fmt.Fprintln(os.Stdout, v)
 		}
 	}()
 

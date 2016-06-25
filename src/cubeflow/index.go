@@ -14,11 +14,11 @@ const (
 type Dir int
 
 type Size struct {
-	Rows, Cols, Layers int
+	Layers, Rows, Cols int
 }
 
 type Index struct {
-	Row, Col, Layer int
+	Layer, Row, Col int
 }
 
 func (idx *Index) Neighbour(dir Dir) (Index, bool) {

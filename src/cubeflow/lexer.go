@@ -13,7 +13,7 @@ type TokenGrid struct {
 func lexer(reader io.Reader) (*TokenGrid, error) {
 	// TODO: currently lexer only reads a single 2D grid
 	grid := &TokenGrid{
-		Size{0, 0, 0},
+		Size{Layers: 1, Rows: 0, Cols: 0},
 		make(map[Index]rune),
 	}
 
@@ -31,8 +31,8 @@ func lexer(reader io.Reader) (*TokenGrid, error) {
 				continue
 			}
 			grid.Tokens[idx] = r
-			if idx.Col > grid.Cols {
-				grid.Cols = idx.Col
+			if idx.Col + 1 > grid.Cols {
+				grid.Cols = idx.Col + 1
 			}
 		}
 		if !any {
@@ -41,10 +41,10 @@ func lexer(reader io.Reader) (*TokenGrid, error) {
 			idx.Layer += 1
 			grid.Layers = idx.Layer
 		} else {
-			idx.Row += 1
-			if idx.Row > grid.Rows {
-				grid.Rows = idx.Row
+			if idx.Row + 1 > grid.Rows {
+				grid.Rows = idx.Row + 1
 			}
+			idx.Row += 1
 		}
 	}
 
