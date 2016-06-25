@@ -1,20 +1,16 @@
 package main
 
 func assembleLayer(grid *TokenGrid) (*Program, error) {
-	// TODO: support more than one input and output chan per layer
+	// TODO: support more than one input and output per layer
 	program := &Program{
-		Size:   grid.Size,
-		Cells:  make(map[Index]Cell),
-		Input:  make(chan Value, 1),
-		Halt:   make(chan int, 1),
-		Output: nil,
+		Size:  grid.Size,
+		Cells: make(map[Index]*Cell),
 	}
 
 	// Build cells & the layer channels
 	for idx, r := range grid.Tokens {
-		cell := Cell{
+		cell := &Cell{
 			Index:  idx,
-			Notify: make(chan Value, 1), // TODO: allow buffering
 			Symbol: r,
 		}
 		switch r {
@@ -22,6 +18,7 @@ func assembleLayer(grid *TokenGrid) (*Program, error) {
 			cell.Type = &Constant{0}
 		case '1':
 			cell.Type = &Constant{1}
+			cell.Read = 1
 		case '@':
 			cell.Type = &Forward{}
 		case '!':
@@ -42,10 +39,10 @@ func assembleLayer(grid *TokenGrid) (*Program, error) {
 	for idx, cell := range program.Cells {
 		switch cell.Symbol {
 		case '@':
-			cell.Type.Bind(program.Input)
+			cell.Type.Bind(&program.read)
 			continue
 		case '!':
-			program.Output = cell.Notify
+			program.write = &cell.Read
 		}
 
 		// Try to bind all the neighbours
@@ -55,7 +52,7 @@ func assembleLayer(grid *TokenGrid) (*Program, error) {
 				continue
 			}
 			// TODO: raise error if it is disconnected
-			if err := cell.Type.Bind(n.Notify); err != nil {
+			if err := cell.Type.Bind(&n.Read); err != nil {
 				return nil, err
 			}
 		}

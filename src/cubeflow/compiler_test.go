@@ -36,18 +36,28 @@ func TestZeroSink(t *testing.T) {
 		t.Fail()
 	}
 
+	output := make(chan Value, 1)
+	input := make(chan Value, 1)
+	halt := make(chan int, 1)
+
 	go func() {
 		for i := 0; i < 10; i += 1 {
-			v, ok := <-program.Output
-			t.Log("zero", v, ok)
-			if !ok || v != 0 {
-				t.Fatal("wrong data")
-			}
+			input <- 0 // Any data
 		}
-		program.Halt <- 0
+		input <- 0 // Latency of 1
+		close(input)
 	}()
 
-	program.Run()
+	go program.Run(input, output, halt)
+
+	<-output // Ignore: latency of 1
+	for i := 0; i < 10; i += 1 {
+		v, ok := <-output
+		t.Log("zero", v, ok)
+		if !ok || v != 0 {
+			t.Fatal("wrong data")
+		}
+	}
 }
 
 func TestSourceSink(t *testing.T) {
@@ -64,31 +74,30 @@ func TestSourceSink(t *testing.T) {
 			t.Fatal("parser failed")
 		}
 
+		output := make(chan Value, 1)
+		input := make(chan Value, 1)
+		halt := make(chan int, 1)
 		data := []Value{1, 2, 3, 4, 5}
 
 		go func() {
 			for _, v := range data {
 				t.Log("send:", v)
-				program.Input <- v
+				input <- v
 			}
-			program.Halt <- 0
+			input <- 0 // Latency of 1
+			close(input)
 		}()
 
-		go func() {
-			var i int
-			for v := range program.Output {
-				t.Log("recv:", v)
-				if v != data[i] {
-					t.Fatal("wrong data")
-				}
-				i += 1
-			}
-			_, ok := <-program.Output
-			if ok {
-				t.Fatal("output should be close")
-			}
-		}()
+		go program.Run(input, output, halt)
 
-		program.Run()
+		<-output // Ignore: latency of 1
+		i := 0
+		for v := range output {
+			t.Log("recv:", v)
+			if v != data[i] {
+				t.Fatal("wrong data")
+			}
+			i += 1
+		}
 	}
 }

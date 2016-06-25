@@ -31,7 +31,7 @@ func lexer(reader io.Reader) (*TokenGrid, error) {
 				continue
 			}
 			grid.Tokens[idx] = r
-			if idx.Col + 1 > grid.Cols {
+			if idx.Col+1 > grid.Cols {
 				grid.Cols = idx.Col + 1
 			}
 		}
@@ -41,7 +41,7 @@ func lexer(reader io.Reader) (*TokenGrid, error) {
 			idx.Layer += 1
 			grid.Layers = idx.Layer
 		} else {
-			if idx.Row + 1 > grid.Rows {
+			if idx.Row+1 > grid.Rows {
 				grid.Rows = idx.Row + 1
 			}
 			idx.Row += 1

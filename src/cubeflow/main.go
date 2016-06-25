@@ -10,8 +10,10 @@ import (
 )
 
 var (
-	verbose = flag.Bool("v", false, "verbose mode")
+	verbose     = flag.Bool("v", false, "verbose mode")
 	pngFilenaem = flag.String("img", "", "png filenaem")
+	latency     = flag.Int("lat", 1, "latency")
+	head        = flag.Int("n", -1, "prints n first results after latency")
 )
 
 func main() {
@@ -43,6 +45,10 @@ func main() {
 		}
 	}
 
+	input := make(chan Value, 1)
+	output := make(chan Value, 1)
+	halt := make(chan int, 1)
+
 	go func() {
 		scanner := bufio.NewScanner(os.Stdin)
 		for scanner.Scan() {
@@ -50,17 +56,26 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
-			program.Input <- Value(n)
+			input <- Value(n)
 		}
-		program.Halt <- 0
+		for i := 0; i < *latency; i += 1 {
+			input <- Value(0)
+		}
+		close(input)
+
 	}()
 
-	go func() {
-		for v := range program.Output {
-			fmt.Fprintln(os.Stdout, v)
-		}
-	}()
+	go program.Run(input, output, halt)
 
-	program.Run()
-	<-program.Halt
+	for i := 0; i < *latency; i += 1 {
+		<-output
+	}
+
+	for i := 0; *head < 0 || i < *head; i += 1 {
+		v, ok := <-output
+		if !ok {
+			break
+		}
+		fmt.Fprintln(os.Stdout, v)
+	}
 }

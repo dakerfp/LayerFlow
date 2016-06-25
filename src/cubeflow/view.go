@@ -2,10 +2,10 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"image"
 	"image/color"
 	"io"
-	"fmt"
 )
 
 func WriteGrid(w io.Writer, p *Program) error {
@@ -21,7 +21,7 @@ func WriteGrid(w io.Writer, p *Program) error {
 			if ok {
 				r = string(cell.Symbol)
 			}
-			if _, err := rw.WriteString(r); err != nil  {
+			if _, err := rw.WriteString(r); err != nil {
 				return err
 			}
 		}
@@ -37,7 +37,7 @@ func clip(v Value, clipMin, clipMax int) uint16 {
 	return uint16(v << 8) // XXX: OMG
 }
 
-func DrawGrid(p* Program, clipMin, clipMax int) image.Image {
+func DrawGrid(p *Program, clipMin, clipMax int) image.Image {
 	img := image.NewGray16(image.Rect(0, 0, p.Rows, p.Cols))
 	// TODO: print multiple layers
 	i := 0
@@ -46,7 +46,7 @@ func DrawGrid(p* Program, clipMin, clipMax int) image.Image {
 			cell, ok := p.Cells[Index{Layer: i, Row: j, Col: k}]
 			c := color.Gray16{Y: 0}
 			if ok {
-				c.Y = clip(cell.Value, clipMin, clipMax)
+				c.Y = clip(cell.Read, clipMin, clipMax)
 			}
 			img.Set(k, j, c)
 		}
