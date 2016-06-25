@@ -24,6 +24,13 @@ func assembleLayer(grid *TokenGrid) (*Program, error) {
 			cell.Type = &Forward{}
 		case '!':
 			cell.Type = &Forward{}
+		case 'C':
+			cell.Type = &Oscillator{
+				Period: 1,
+				Function: func(i, p uint64) Value {
+					return Value(i)
+				},
+			}
 		}
 		program.Cells[idx] = cell
 	}

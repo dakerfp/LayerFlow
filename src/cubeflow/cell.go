@@ -83,4 +83,29 @@ func (c *Constant) SinkDir() Dir {
 	return DirsPlane
 }
 
+type Oscillator struct {
+	Clock    uint64
+	Period   uint64
+	Function func(uint64, uint64) Value
+}
 
+func (o *Oscillator) Exec(notify chan Value, halt chan int) bool {
+	o.Clock += 1
+	if o.Clock > o.Period {
+		o.Clock = 0
+	}
+	select {
+	case <-halt:
+		return false
+	case notify <- o.Function(o.Clock, o.Period):
+		return true
+	}
+}
+
+func (o *Oscillator) Bind(chan Value) error {
+	return nil
+}
+
+func (o *Oscillator) SinkDir() Dir {
+	return DirsPlane
+}
