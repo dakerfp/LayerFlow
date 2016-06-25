@@ -30,7 +30,7 @@ var ErrBinding = errors.New("Error on binding")
 
 type Forward struct {
 	SinkTo Dir
-	Input chan Value
+	Input  chan Value
 }
 
 func (s *Forward) Exec(notify chan Value, halt chan int) bool {
