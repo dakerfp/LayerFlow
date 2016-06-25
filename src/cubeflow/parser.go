@@ -20,6 +20,8 @@ func assembleLayer(grid *TokenGrid) (*Program, error) {
 		switch r {
 		case '0':
 			cell.Type = &Constant{0}
+		case '1':
+			cell.Type = &Constant{1}
 		case '@':
 			cell.Type = &Forward{}
 		case '!':
