@@ -56,11 +56,12 @@ func TestSourceSink(t *testing.T) {
 		r := strings.NewReader(source)
 		tokenGrid, err := lexer(r)
 		if err != nil {
-			t.Fail()
+			t.Fatal("lexer failed")
 		}
+
 		program, err := assembleLayer(tokenGrid)
 		if err != nil {
-			t.Fail()
+			t.Fatal("parser failed")
 		}
 
 		data := []Value{1, 2, 3, 4, 5}
