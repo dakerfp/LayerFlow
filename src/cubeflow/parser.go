@@ -1,6 +1,6 @@
 package main
 
-func assembleLayer(grid *TokenGrid) (*Program, error) {
+func parse(grid *TokenGrid) (*Program, error) {
 	// TODO: support more than one input and output per layer
 	program := &Program{
 		Size:  grid.Size,

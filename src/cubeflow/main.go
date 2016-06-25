@@ -34,9 +34,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	program, err := assembleLayer(tokenGrid)
+	program, err := parse(tokenGrid)
 	if err != nil {
-		log.Fatal("compilation error")
+		log.Fatal("compilation error", err)
 	}
 	if *verbose {
 		err = WriteGrid(os.Stderr, program)

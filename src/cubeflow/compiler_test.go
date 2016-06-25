@@ -19,7 +19,7 @@ func TestCompile(t *testing.T) {
 		if err != nil {
 			t.Fail()
 		}
-		if _, err := assembleLayer(tokenGrid); err != nil {
+		if _, err := parse(tokenGrid); err != nil {
 			t.Fail()
 		}
 	}
@@ -31,7 +31,7 @@ func TestZeroSink(t *testing.T) {
 	if err != nil {
 		t.Fail()
 	}
-	program, err := assembleLayer(tokenGrid)
+	program, err := parse(tokenGrid)
 	if err != nil {
 		t.Fail()
 	}
@@ -69,7 +69,7 @@ func TestSourceSink(t *testing.T) {
 			t.Fatal("lexer failed")
 		}
 
-		program, err := assembleLayer(tokenGrid)
+		program, err := parse(tokenGrid)
 		if err != nil {
 			t.Fatal("parser failed")
 		}
