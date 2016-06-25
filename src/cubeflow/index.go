@@ -24,17 +24,17 @@ type Index struct {
 func (idx *Index) Neighbour(dir Dir) (Index, bool) {
 	switch dir {
 	case DirUp:
-		return Index{idx.Row - 1, idx.Col, idx.Layer}, true
+		return Index{idx.Layer, idx.Row - 1, idx.Col}, true
 	case DirDown:
-		return Index{idx.Row + 1, idx.Col, idx.Layer}, true
+		return Index{idx.Layer, idx.Row + 1, idx.Col}, true
 	case DirLeft:
-		return Index{idx.Row, idx.Col - 1, idx.Layer}, true
+		return Index{idx.Layer, idx.Row, idx.Col - 1}, true
 	case DirRight:
-		return Index{idx.Row, idx.Col + 1, idx.Layer}, true
+		return Index{idx.Layer, idx.Row, idx.Col + 1}, true
 	case DirTop:
-		return Index{idx.Row, idx.Col, idx.Layer - 1}, true
+		return Index{idx.Layer - 1, idx.Row, idx.Col}, true
 	case DirBottom:
-		return Index{idx.Row, idx.Col, idx.Layer + 1}, true
+		return Index{idx.Layer + 1, idx.Row, idx.Col}, true
 	}
 	return *idx, false
 }
