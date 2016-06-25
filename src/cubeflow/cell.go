@@ -23,11 +23,13 @@ type Cell struct {
 type Type interface {
 	Exec(notify chan Value, halt chan int) bool
 	Bind(input chan Value) error
+	SinkDir() Dir
 }
 
 var ErrBinding = errors.New("Error on binding")
 
 type Forward struct {
+	SinkTo Dir
 	Input chan Value
 }
 
@@ -56,6 +58,10 @@ func (f *Forward) Bind(notify chan Value) error {
 	return nil
 }
 
+func (f *Forward) SinkDir() Dir {
+	return f.SinkTo
+}
+
 type Constant struct {
 	Value
 }
@@ -71,6 +77,10 @@ func (c *Constant) Exec(notify chan Value, halt chan int) bool {
 
 func (c *Constant) Bind(chan Value) error {
 	return nil
+}
+
+func (c *Constant) SinkDir() Dir {
+	return DirsPlane
 }
 
 
