@@ -13,8 +13,6 @@ type Program struct {
 
 type Value int64
 
-type Dir int
-
 type Cell struct {
 	Index
 	Symbol rune

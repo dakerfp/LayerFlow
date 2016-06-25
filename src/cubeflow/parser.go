@@ -40,12 +40,14 @@ func assembleLayer(grid *TokenGrid) (*Program, error) {
 		}
 
 		// Try to bind all the neighbours
-		for _, nidx := range idx.Neighbours() {
-			if n, ok := program.Cells[nidx]; ok {
-				err := cell.Type.Bind(n.Notify)
-				if err != nil {
-					return nil, err
-				}
+		for _, nidx := range idx.Neighbours(DirsPlane) {
+			n, ok := program.Cells[nidx]
+			if !ok {
+				continue
+			}
+			// TODO: raise error if it is disconnected
+			if err := cell.Type.Bind(n.Notify); err != nil {
+				return nil, err
 			}
 		}
 	}
