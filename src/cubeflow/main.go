@@ -4,21 +4,19 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
-	"io"
 	"log"
 	"os"
 	"strconv"
-	"strings"
 )
 
-var inputData = flag.String("i", "", "input data")
-var debug = flag.Bool("d", false, "debug, mode")
+var (
+	verbose = flag.Bool("v", false, "verbose mode")
+)
 
 func main() {
 	flag.Parse()
 
 	if len(flag.Args()) < 1 {
-		log.Fatal(flag.Args())
 		log.Fatal("a script is required")
 	}
 
@@ -36,18 +34,19 @@ func main() {
 	program, err := assembleLayer(tokenGrid)
 	if err != nil {
 		log.Fatal("compilation error")
-	} else if *debug {
+	} else if *verbose {
 		log.Println(program)
 	}
 
-	go func() {
-		var r io.Reader
-		if *inputData != "" {
-			r = strings.NewReader(*inputData)
-		} else {
-			r = os.Stdin
+	if *verbose {
+		err = WriteGrid(os.Stdout, program)
+		if err != nil {
+			log.Fatal(err)
 		}
-		scanner := bufio.NewScanner(r)
+	}
+
+	go func() {
+		scanner := bufio.NewScanner(os.Stdin)
 		for scanner.Scan() {
 			n, err := strconv.Atoi(scanner.Text())
 			if err != nil {

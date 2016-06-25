@@ -6,7 +6,7 @@ import (
 
 func (cell Cell) Clock(halt chan int) {
 	for cell.Type.Exec(cell.Notify, halt) {
-		if *debug {
+		if *verbose {
 			log.Println("spin", cell)
 		}
 	}
@@ -14,12 +14,12 @@ func (cell Cell) Clock(halt chan int) {
 }
 
 func (program *Program) Run() {
-	if *debug {
+	if *verbose {
 		log.Println(program.Input)
 		log.Println(program.Output)
 	}
 	for _, cell := range program.Cells {
-		if *debug {
+		if *verbose {
 			log.Println(cell)
 			log.Println(cell.Type)
 		}
