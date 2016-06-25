@@ -90,14 +90,14 @@ type Oscillator struct {
 }
 
 func (o *Oscillator) Exec(notify chan Value, halt chan int) bool {
-	o.Clock += 1
-	if o.Clock > o.Period {
-		o.Clock = 0
-	}
 	select {
 	case <-halt:
 		return false
 	case notify <- o.Function(o.Clock, o.Period):
+		o.Clock += 1
+		if o.Clock > o.Period {
+			o.Clock = 0
+		}
 		return true
 	}
 }
