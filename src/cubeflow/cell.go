@@ -15,6 +15,7 @@ type Value int64
 
 type Cell struct {
 	Index
+	Value  Value
 	Symbol rune
 	Notify chan Value
 	Type   Type

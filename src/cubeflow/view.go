@@ -2,6 +2,8 @@ package main
 
 import (
 	"bufio"
+	"image"
+	"image/color"
 	"io"
 	"fmt"
 )
@@ -29,4 +31,25 @@ func WriteGrid(w io.Writer, p *Program) error {
 	}
 
 	return rw.Flush()
+}
+
+func clip(v Value, clipMin, clipMax int) uint16 {
+	return uint16(v << 8) // XXX: OMG
+}
+
+func DrawGrid(p* Program, clipMin, clipMax int) image.Image {
+	img := image.NewGray16(image.Rect(0, 0, p.Rows, p.Cols))
+	// TODO: print multiple layers
+	i := 0
+	for j := 0; j < p.Rows; j += 1 {
+		for k := 0; k < p.Cols; k += 1 {
+			cell, ok := p.Cells[Index{Layer: i, Row: j, Col: k}]
+			c := color.Gray16{Y: 0}
+			if ok {
+				c.Y = clip(cell.Value, clipMin, clipMax)
+			}
+			img.Set(k, j, c)
+		}
+	}
+	return img
 }

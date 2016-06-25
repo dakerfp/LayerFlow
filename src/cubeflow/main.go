@@ -11,6 +11,7 @@ import (
 
 var (
 	verbose = flag.Bool("v", false, "verbose mode")
+	pngFilenaem = flag.String("img", "", "png filenaem")
 )
 
 func main() {
