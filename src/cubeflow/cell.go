@@ -14,10 +14,10 @@ type Program struct {
 type Value int64
 
 type Cell struct {
-	Index
-	Read, Write Value
-	Symbol      rune
-	Type        Type
+	Type   Type
+	Read   Value
+	Write  Value
+	Symbol rune
 }
 
 type Type interface {

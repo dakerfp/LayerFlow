@@ -10,7 +10,6 @@ func parse(grid *TokenGrid) (*Program, error) {
 	// Build cells & the layer channels
 	for idx, r := range grid.Tokens {
 		cell := &Cell{
-			Index:  idx,
 			Symbol: r,
 		}
 		switch r {
