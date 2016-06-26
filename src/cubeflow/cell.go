@@ -23,14 +23,17 @@ type Cell struct {
 type Type interface {
 	Exec(Value) Value
 	Bind(*Value) error
-	SinkDir() Dir
+	OfferDir() Dir
+	RequestDir() Dir
 }
 
-var ErrBinding = errors.New("Error on binding")
+var ErrBinding = errors.New("error on binding")
+var ErrTooManyBinings = errors.New("too many bindings")
 
 type Forward struct {
-	SinkTo Dir
-	Input  *Value
+	SourceDir Dir
+	SinkDir   Dir
+	Input     *Value
 }
 
 func (s *Forward) Exec(Value) Value {
@@ -45,8 +48,12 @@ func (f *Forward) Bind(input *Value) error {
 	return nil
 }
 
-func (f *Forward) SinkDir() Dir {
-	return f.SinkTo
+func (f *Forward) RequestDir() Dir {
+	return f.SourceDir
+}
+
+func (f *Forward) OfferDir() Dir {
+	return f.SinkDir
 }
 
 type Constant struct {
@@ -61,8 +68,12 @@ func (c *Constant) Bind(*Value) error {
 	return nil
 }
 
-func (c *Constant) SinkDir() Dir {
+func (c *Constant) OfferDir() Dir {
 	return DirsPlane
+}
+
+func (c *Constant) RequestDir() Dir {
+	return DirNone
 }
 
 type Oscillator struct {
@@ -84,6 +95,11 @@ func (o *Oscillator) Bind(*Value) error {
 	return nil
 }
 
-func (o *Oscillator) SinkDir() Dir {
+func (o *Oscillator) OfferDir() Dir {
 	return DirsPlane
 }
+
+func (o *Oscillator) RequestDir() Dir {
+	return DirNone
+}
+

@@ -1,5 +1,11 @@
 package main
 
+import (
+	"errors"
+)
+
+var ErrTooManyDirs = errors.New("Too many directions")
+
 const (
 	DirUp = 1 << iota
 	DirDown
@@ -9,6 +15,7 @@ const (
 	DirBottom
 	DirsPlane = DirUp | DirDown | DirLeft | DirRight
 	DirsAll   = DirsPlane | DirTop | DirBottom
+	DirNone   = 0
 )
 
 type Dir int
@@ -21,22 +28,40 @@ type Index struct {
 	Layer, Row, Col int
 }
 
-func (idx *Index) Neighbour(dir Dir) (Index, bool) {
+func InverseDir(dir Dir) Dir {
 	switch dir {
 	case DirUp:
-		return Index{idx.Layer, idx.Row - 1, idx.Col}, true
+		return DirDown
 	case DirDown:
-		return Index{idx.Layer, idx.Row + 1, idx.Col}, true
+		return DirUp
 	case DirLeft:
-		return Index{idx.Layer, idx.Row, idx.Col - 1}, true
+		return DirRight
 	case DirRight:
-		return Index{idx.Layer, idx.Row, idx.Col + 1}, true
+		return DirLeft
 	case DirTop:
-		return Index{idx.Layer - 1, idx.Row, idx.Col}, true
+		return DirBottom
 	case DirBottom:
-		return Index{idx.Layer + 1, idx.Row, idx.Col}, true
+		return DirTop
 	}
-	return *idx, false
+	return DirNone
+}
+
+func (idx *Index) Neighbour(dir Dir) (Index, error) {
+	switch dir {
+	case DirUp:
+		return Index{idx.Layer, idx.Row - 1, idx.Col}, nil
+	case DirDown:
+		return Index{idx.Layer, idx.Row + 1, idx.Col}, nil
+	case DirLeft:
+		return Index{idx.Layer, idx.Row, idx.Col - 1}, nil
+	case DirRight:
+		return Index{idx.Layer, idx.Row, idx.Col + 1}, nil
+	case DirTop:
+		return Index{idx.Layer - 1, idx.Row, idx.Col}, nil
+	case DirBottom:
+		return Index{idx.Layer + 1, idx.Row, idx.Col}, nil
+	}
+	return Index{}, ErrTooManyDirs
 }
 
 func Dirs(dir Dir) []Dir {
@@ -47,13 +72,4 @@ func Dirs(dir Dir) []Dir {
 		}
 	}
 	return dirs
-}
-
-func (idx *Index) Neighbours(dir Dir) []Index {
-	dirs := Dirs(dir)
-	idxs := make([]Index, len(dirs))
-	for i, d := range dirs {
-		idxs[i], _ = idx.Neighbour(d)
-	}
-	return idxs
 }

@@ -19,9 +19,15 @@ func parse(grid *TokenGrid) (*Program, error) {
 			cell.Type = &Constant{1}
 			cell.Read = 1
 		case '@':
-			cell.Type = &Forward{}
+			cell.Type = &Forward{
+				SourceDir: DirNone,
+				SinkDir:   DirsPlane,
+			}
 		case '!':
-			cell.Type = &Forward{}
+			cell.Type = &Forward{
+				SourceDir: DirsPlane,
+				SinkDir:   DirNone,
+			}
 		case 'C':
 			cell.Type = &Oscillator{
 				Period: 1,
@@ -36,24 +42,34 @@ func parse(grid *TokenGrid) (*Program, error) {
 	// Link cells
 	// TODO: raise error if has no connection
 	for idx, cell := range program.Cells {
+		// Try to bind all the neighbours
+		for _, dir := range Dirs(cell.Type.RequestDir()) {
+			nidx, err := idx.Neighbour(dir)
+			if err != nil {
+				return nil, err
+			}
+
+			neighbour, ok := program.Cells[nidx]
+			if !ok {
+				continue
+			}
+
+			// Try to matching offer and request
+			if InverseDir(dir)&neighbour.Type.OfferDir() == 0 {
+				continue
+			}
+
+			if err := cell.Type.Bind(&neighbour.Read); err != nil {
+				return nil, err
+			}
+		}
+
 		switch cell.Symbol {
 		case '@':
 			cell.Type.Bind(&program.read)
 			continue
 		case '!':
 			program.write = &cell.Read
-		}
-
-		// Try to bind all the neighbours
-		for _, nidx := range idx.Neighbours(DirsPlane) {
-			n, ok := program.Cells[nidx]
-			if !ok {
-				continue
-			}
-			// TODO: raise error if it is disconnected
-			if err := cell.Type.Bind(&n.Read); err != nil {
-				return nil, err
-			}
 		}
 	}
 
