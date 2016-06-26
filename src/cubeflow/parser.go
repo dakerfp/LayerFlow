@@ -28,6 +28,26 @@ func parse(grid *TokenGrid) (*Program, error) {
 				SourceDir: DirsPlane,
 				SinkDir:   DirNone,
 			}
+		case '^':
+			cell.Type = &Forward{
+				SourceDir: DirRight | DirLeft | DirDown,
+				SinkDir:   DirUp,
+			}
+		case '<':
+			cell.Type = &Forward{
+				SourceDir: DirRight | DirUp | DirDown,
+				SinkDir:   DirLeft,
+			}
+		case '>':
+			cell.Type = &Forward{
+				SourceDir: DirUp | DirLeft | DirDown,
+				SinkDir:   DirRight,
+			}
+		case 'v':
+			cell.Type = &Forward{
+				SourceDir: DirRight | DirLeft | DirUp,
+				SinkDir:   DirDown,
+			}
 		case 'C':
 			cell.Type = &Oscillator{
 				Period: 1,
