@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"strconv"
@@ -15,6 +16,18 @@ var (
 	latency     = flag.Int("lat", 1, "latency")
 	head        = flag.Int("n", -1, "prints n first results after latency")
 )
+
+func ReadInts(r io.Reader, output chan Value) error {
+	scanner := bufio.NewScanner(r)
+	for scanner.Scan() {
+		n, err := strconv.Atoi(scanner.Text())
+		if err != nil {
+			return err
+		}
+		output <- Value(n)
+	}
+	return nil
+}
 
 func main() {
 	flag.Parse()
@@ -50,13 +63,8 @@ func main() {
 	halt := make(chan int, 1)
 
 	go func() {
-		scanner := bufio.NewScanner(os.Stdin)
-		for scanner.Scan() {
-			n, err := strconv.Atoi(scanner.Text())
-			if err != nil {
-				log.Fatal(err)
-			}
-			input <- Value(n)
+		if err := ReadInts(os.Stdin, input); err != nil {
+			log.Fatal(err)
 		}
 		for i := 0; i < *latency; i += 1 {
 			input <- Value(0)

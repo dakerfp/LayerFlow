@@ -1,7 +1,11 @@
 package main
 
 import (
+	"bytes"
+	"io/ioutil"
 	"os"
+	"os/exec"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -98,6 +102,51 @@ func TestSourceSink(t *testing.T) {
 				t.Fatal("wrong data")
 			}
 			i += 1
+		}
+	}
+}
+
+func TestInterpreter(t *testing.T) {
+	dirs, err := filepath.Glob("testdata/*")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(dirs) == 0 {
+		wd, _ := os.Getwd()
+		t.Fatal("no tests in testdata found in: ", wd)
+	}
+	for _, dir := range dirs {
+		fin, err := os.Open(filepath.Join(dir, "input.txt"))
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer fin.Close()
+
+		fout, err := ioutil.TempFile("", "test")
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer fout.Close()
+
+		cmd := exec.Command("cubeflow", filepath.Join(dir, "program.cf"))
+		cmd.Stdin = fin
+		cmd.Stdout = fout
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		err = cmd.Run()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		fout.Close()
+		buffer := bytes.Buffer{}
+		cmd = exec.Command("diff", fout.Name(), filepath.Join(dir, "output.txt"))
+		cmd.Stdout = &buffer
+		err = cmd.Run()
+		if err != nil {
+			t.Fatal(string(buffer.Bytes()))
 		}
 	}
 }
