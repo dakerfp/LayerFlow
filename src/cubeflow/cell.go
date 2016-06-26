@@ -103,3 +103,31 @@ func (o *Oscillator) RequestDir() Dir {
 	return DirNone
 }
 
+type BinaryOp struct {
+	A, B     *Value
+	Function func(Value, Value) Value
+}
+
+func (b *BinaryOp) Exec(Value) Value {
+	return b.Function(*b.A, *b.B)
+}
+
+func (b *BinaryOp) Bind(input *Value) error {
+	if b.A == nil {
+		b.A = input
+		return nil
+	}
+	if b.B == nil {
+		b.B = input
+		return nil
+	}
+	return ErrTooManyBinings
+}
+
+func (b *BinaryOp) OfferDir() Dir {
+	return DirRight | DirDown
+}
+
+func (b *BinaryOp) RequestDir() Dir {
+	return DirLeft | DirUp
+}

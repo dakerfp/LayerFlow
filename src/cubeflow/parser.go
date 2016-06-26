@@ -35,6 +35,12 @@ func parse(grid *TokenGrid) (*Program, error) {
 					return Value(i)
 				},
 			}
+		case '+':
+			cell.Type = &BinaryOp{
+				Function: func(a, b Value) Value {
+					return a + b
+				},
+			}
 		}
 		program.Cells[idx] = cell
 	}
