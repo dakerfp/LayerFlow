@@ -13,11 +13,10 @@ func parse(grid *TokenGrid) (*Program, error) {
 			Symbol: r,
 		}
 		switch r {
-		case '0':
-			cell.Type = &Constant{0}
-		case '1':
-			cell.Type = &Constant{1}
-			cell.Read = 1
+		case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
+			n := Value(r - '0')
+			cell.Type = &Constant{n}
+			cell.Read = n
 		case '@':
 			cell.Type = &Forward{
 				SourceDir: DirNone,
