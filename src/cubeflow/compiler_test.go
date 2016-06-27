@@ -126,26 +126,22 @@ func TestInterpreter(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer fout.Close()
+		defer func() {
+			fout.Close()
+			os.Remove(fout.Name())
+		}()
 
-		cmd := exec.Command("cubeflow", filepath.Join(dir, "program.cf"))
+		wd, _ := os.Getwd()
+		cmd := exec.Command(filepath.Join(wd, "cubeflow"), "-o", fout.Name(), filepath.Join(dir, "program.cf"))
 		cmd.Stdin = fin
-		cmd.Stdout = fout
-		if err != nil {
-			t.Fatal(err)
+		if err = cmd.Run(); err != nil {
+			t.Fatal(err, cmd.Path)
 		}
 
-		err = cmd.Run()
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		fout.Close()
 		buffer := bytes.Buffer{}
 		cmd = exec.Command("diff", fout.Name(), filepath.Join(dir, "output.txt"))
 		cmd.Stdout = &buffer
-		err = cmd.Run()
-		if err != nil {
+		if err = cmd.Run(); err != nil {
 			t.Fatal(string(buffer.Bytes()))
 		}
 	}
