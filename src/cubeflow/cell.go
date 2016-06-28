@@ -125,9 +125,9 @@ func (b *BinaryOp) Bind(input *Value) error {
 }
 
 func (b *BinaryOp) OfferDir() Dir {
-	return DirRight | DirDown
+	return DirsPlane
 }
 
 func (b *BinaryOp) RequestDir() Dir {
-	return DirLeft | DirUp
+	return DirsPlane
 }
