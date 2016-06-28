@@ -66,6 +66,12 @@ func parse(grid *TokenGrid) (*Program, error) {
 					return a * b
 				},
 			}
+		case '-':
+			cell.Type = &UnaryOp{
+				Function: func(a Value) Value {
+					return -a
+				},
+			}
 		}
 
 		program.Cells[idx] = cell

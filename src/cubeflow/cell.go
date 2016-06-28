@@ -131,3 +131,28 @@ func (b *BinaryOp) OfferDir() Dir {
 func (b *BinaryOp) RequestDir() Dir {
 	return DirsPlane
 }
+
+type UnaryOp struct {
+	V   *Value
+	Function func(Value) Value
+}
+
+func (u *UnaryOp) Exec(Value) Value {
+	return u.Function(*u.V)
+}
+
+func (u *UnaryOp) Bind(input *Value) error {
+	if u.V == nil {
+		u.V = input
+		return nil
+	}
+	return ErrTooManyBinings
+}
+
+func (u *UnaryOp) OfferDir() Dir {
+	return DirsPlane
+}
+
+func (u *UnaryOp) RequestDir() Dir {
+	return DirsPlane
+}
