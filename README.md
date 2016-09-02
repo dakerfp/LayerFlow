@@ -1,19 +1,19 @@
-# Cubeflow
+# LayerFlow
 
-This project defines the Gridflow language, its
+This project defines the LayerFlow language, its
 interpreter and its visual debugger written in Go.
 
 
 ## The language
 
-Cubeflow is a laguage based on data flowing.
+LayerFlow is a laguage based on data flowing.
 In some aspects it is more like HDL languages
 It can also be translated into hardware.
 
 
 ## Building
 
-$ go build cubeflow
+$ go build
 
 
 ## Contributing
