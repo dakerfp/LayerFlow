@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"image/png"
 )
 
 var (
@@ -15,6 +16,7 @@ var (
 	outputFilename = flag.String("o", "", "output into file")
 	latency        = flag.Int("lat", 1, "latency")
 	head           = flag.Int("n", -1, "prints n first results after latency")
+	drawFilename   = flag.String("draw", "", "draw program into a png file")
 )
 
 func ReadInts(r io.Reader, output chan Value) error {
@@ -42,11 +44,13 @@ func main() {
 	}
 	defer f.Close()
 
+	// Parse
 	tokenGrid, err := lexer(f)
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	// Compile program
 	program, err := parse(tokenGrid)
 	if err != nil {
 		log.Fatal("compilation error", err)
@@ -58,10 +62,26 @@ func main() {
 		}
 	}
 
+	// Draw routine
+	if *drawFilename != "" {
+		img := NewProgramView(program)
+		out, err := os.OpenFile(*drawFilename, os.O_CREATE|os.O_WRONLY, 0666)
+		if err != nil {
+			log.Fatal(err)	
+		}
+		defer out.Close()
+
+		err = png.Encode(out, img)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
 	input := make(chan Value, 1)
 	output := make(chan Value, 1)
 	halt := make(chan int, 1)
 
+	// Reading values from input
 	go func() {
 		if err := ReadInts(os.Stdin, input); err != nil {
 			log.Fatal(err)
