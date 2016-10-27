@@ -1,5 +1,9 @@
 package main
 
+import (
+	"fmt"
+)
+
 func parse(grid *TokenGrid) (*Program, error) {
 	// TODO: support more than one input and output per layer
 	program := &Program{
@@ -88,7 +92,7 @@ func parse(grid *TokenGrid) (*Program, error) {
 		for _, dir := range Dirs(cell.Type.RequestDir()) {
 			nidx, err := idx.Neighbour(dir)
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("Error in neighborhood: %v", err)
 			}
 
 			neighbour, ok := program.Cells[nidx]
