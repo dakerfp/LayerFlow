@@ -4,11 +4,11 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"image/png"
 	"io"
 	"log"
 	"os"
 	"strconv"
-	"image/png"
 )
 
 var (
@@ -67,7 +67,7 @@ func main() {
 		img := NewProgramView(program, 0) // Layer 0
 		out, err := os.OpenFile(*drawFilename, os.O_CREATE|os.O_WRONLY, 0666)
 		if err != nil {
-			log.Fatal(err)	
+			log.Fatal(err)
 		}
 		defer out.Close()
 

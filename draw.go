@@ -9,16 +9,16 @@ import (
 
 type ProgramView struct {
 	Program *Program
-	Layer int
+	Layer   int
 }
 
 func (view *ProgramView) ColorModel() color.Model {
 	return color.RGBA64Model
-	
+
 }
 
 func (view *ProgramView) Bounds() image.Rectangle {
-	return image.Rectangle {
+	return image.Rectangle{
 		Min: image.Point{0, 0},
 		Max: image.Point{view.Program.Rows, view.Program.Cols},
 	}

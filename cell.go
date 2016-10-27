@@ -133,7 +133,7 @@ func (b *BinaryOp) RequestDir() Dir {
 }
 
 type UnaryOp struct {
-	V   *Value
+	V        *Value
 	Function func(Value) Value
 }
 
@@ -162,7 +162,7 @@ type Pulse struct {
 }
 
 func (p *Pulse) Exec(v Value) Value {
-	if (p.Value == 0) {
+	if p.Value == 0 {
 		return 0
 	}
 	v = p.Value
