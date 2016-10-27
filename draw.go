@@ -25,11 +25,11 @@ func (view *ProgramView) Bounds() image.Rectangle {
 }
 
 var (
-	ColorRed    = color.NRGBA{R: 255, A: 255}
-	ColorGreen  = color.NRGBA{G: 255, A: 255}
-	ColorBlue   = color.NRGBA{B: 255, A: 255}
-	ColorYellow = color.NRGBA{R: 255, G: 255, A: 255}
-	ColorCyan   = color.NRGBA{G: 255, B: 255, A: 255}
+	ColorRed    = color.NRGBA64{R: 255, A: 255}
+	ColorGreen  = color.NRGBA64{G: 255, A: 255}
+	ColorBlue   = color.NRGBA64{B: 255, A: 255}
+	ColorYellow = color.NRGBA64{R: 255, G: 255, A: 255}
+	ColorCyan   = color.NRGBA64{G: 255, B: 255, A: 255}
 )
 
 func (view *ProgramView) At(x, y int) color.Color {
