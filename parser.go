@@ -72,6 +72,10 @@ func parse(grid *TokenGrid) (*Program, error) {
 					return -a
 				},
 			}
+		case 'P':
+			cell.Type = &Pulse{
+				Value: Value(1),
+			}
 		}
 
 		program.Cells[idx] = cell

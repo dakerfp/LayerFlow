@@ -156,3 +156,28 @@ func (u *UnaryOp) OfferDir() Dir {
 func (u *UnaryOp) RequestDir() Dir {
 	return DirsPlane
 }
+
+type Pulse struct {
+	Value
+}
+
+func (p *Pulse) Exec(v Value) Value {
+	if (p.Value == 0) {
+		return 0
+	}
+	v = p.Value
+	p.Value = 0
+	return v
+}
+
+func (*Pulse) Bind(*Value) error {
+	return nil
+}
+
+func (p *Pulse) OfferDir() Dir {
+	return DirsPlane
+}
+
+func (p *Pulse) RequestDir() Dir {
+	return DirNone
+}
