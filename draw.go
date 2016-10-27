@@ -5,13 +5,12 @@ import (
 	"image/color"
 )
 
-
 // Currently only the first layer is supported
 
 type ProgramView struct {
 	Program *Program
+	Layer int
 }
-
 
 func (view *ProgramView) ColorModel() color.Model {
 	return color.RGBA64Model
@@ -34,7 +33,7 @@ var (
 )
 
 func (view *ProgramView) At(x, y int) color.Color {
-	idx := Index{Layer: 0, Row: x, Col: y}
+	idx := Index{Layer: view.Layer, Row: x, Col: y}
 	cell, ok := view.Program.Cells[idx]
 	if !ok {
 		return color.Transparent
@@ -59,6 +58,6 @@ func (view *ProgramView) At(x, y int) color.Color {
 	return color.White // TODO: paint different colors for each kind of cell
 }
 
-func NewProgramView(p *Program) *ProgramView {
-	return &ProgramView{p}
+func NewProgramView(p *Program, layer int) *ProgramView {
+	return &ProgramView{p, layer}
 }

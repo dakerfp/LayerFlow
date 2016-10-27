@@ -64,7 +64,7 @@ func main() {
 
 	// Draw routine
 	if *drawFilename != "" {
-		img := NewProgramView(program)
+		img := NewProgramView(program, 0) // Layer 0
 		out, err := os.OpenFile(*drawFilename, os.O_CREATE|os.O_WRONLY, 0666)
 		if err != nil {
 			log.Fatal(err)	
