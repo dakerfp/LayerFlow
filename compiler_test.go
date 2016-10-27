@@ -132,7 +132,7 @@ func TestInterpreter(t *testing.T) {
 		}()
 
 		wd, _ := os.Getwd()
-		cmd := exec.Command(filepath.Join(wd, "cubeflow"), "-o", fout.Name(), filepath.Join(dir, "program.cf"))
+		cmd := exec.Command(filepath.Join(wd, "LayerFlow"), "-o", fout.Name(), filepath.Join(dir, "program.cf"))
 		cmd.Stdin = fin
 		if err = cmd.Run(); err != nil {
 			t.Fatal(err, cmd.Path)
